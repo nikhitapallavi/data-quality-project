@@ -1,33 +1,28 @@
 name: 🔍 Data Quality Checks
 
-# ── When to run ───────────────────────────────────────────
 on:
   push:
-    branches: [main]        # Runs on every push to main
+    branches: [main]
 
 jobs:
   data-quality:
-    runs-on: ubuntu-latest  # GitHub provides this machine
+    runs-on: ubuntu-latest
 
     steps:
 
-      # ── Step 1: Download your code ──────────────────────
       - name: 📥 Checkout Code
         uses: actions/checkout@v3
 
-      # ── Step 2: Install Python ──────────────────────────
-      - name: 🐍 Setup Python 3.10
+      - name: 🐍 Setup Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      # ── Step 3: Install all pip packages ────────────────
       - name: 📦 Install Dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ── Step 4: Run your quality checks ─────────────────
       - name: 🔍 Run Data Quality Checks
         run: python run_allchecks.py
         env:
@@ -43,7 +38,6 @@ jobs:
           TRIGGERED_BY:         github_actions
           ENVIRONMENT:          production
 
-      # ── Step 5: Show result in GitHub ───────────────────
       - name: ✅ Success Message
         if: success()
         run: echo "🎉 All data quality checks passed!"
