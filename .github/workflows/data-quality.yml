@@ -1,0 +1,53 @@
+name: 🔍 Data Quality Checks
+
+# ── When to run ───────────────────────────────────────────
+on:
+  push:
+    branches: [main]        # Runs on every push to main
+
+jobs:
+  data-quality:
+    runs-on: ubuntu-latest  # GitHub provides this machine
+
+    steps:
+
+      # ── Step 1: Download your code ──────────────────────
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v3
+
+      # ── Step 2: Install Python ──────────────────────────
+      - name: 🐍 Setup Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # ── Step 3: Install all pip packages ────────────────
+      - name: 📦 Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # ── Step 4: Run your quality checks ─────────────────
+      - name: 🔍 Run Data Quality Checks
+        run: python run_all_checks.py
+        env:
+          POSTGRES_CONNECTION:  ${{ secrets.POSTGRES_CONNECTION }}
+          MYSQL_CONNECTION:     ${{ secrets.MYSQL_CONNECTION }}
+          MONGO_CONNECTION:     ${{ secrets.MONGO_CONNECTION }}
+          CLICKHOUSE_HOST:      ${{ secrets.CLICKHOUSE_HOST }}
+          CLICKHOUSE_PORT:      8123
+          CLICKHOUSE_USER:      default
+          CLICKHOUSE_PASSWORD:  ${{ secrets.CLICKHOUSE_PASSWORD }}
+          CLICKHOUSE_DB:        data_quality
+          DEPLOYMENT_ID:        ${{ github.sha }}
+          TRIGGERED_BY:         github_actions
+          ENVIRONMENT:          production
+
+      # ── Step 5: Show result in GitHub ───────────────────
+      - name: ✅ Success Message
+        if: success()
+        run: echo "🎉 All data quality checks passed!"
+
+      - name: ❌ Failure Message
+        if: failure()
+        run: echo "🚨 Data quality checks failed! Check logs above."
