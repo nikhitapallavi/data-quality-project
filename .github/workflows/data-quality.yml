@@ -21,7 +21,14 @@ jobs:
       - name: 📦 Install Dependencies
         run: |
           pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install pandas \
+                      sqlalchemy \
+                      psycopg2-binary \
+                      pymysql \
+                      pymongo \
+                      clickhouse-connect \
+                      python-dotenv \
+                      great_expectations==0.18.12
 
       - name: 🔍 Run Data Quality Checks
         run: python run_allchecks.py
